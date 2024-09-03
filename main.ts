@@ -5,7 +5,7 @@ export const config = {
   export default async function handler(req: Request) {
 	if (req.method === 'GET') {
 	  const MONGO_DATA_API_URL = Deno.env.get("MONGO_DATA_API_URL") as string;
-	  const MONGO_API_KEY = Deno.env.get("MONGO_API_KEu") as string;
+	  const MONGO_API_KEY = Deno.env.get("MONGO_API_KEY") as string;
 	  
 	  const body = {
 		dataSource: 'Cluster0', // Nome do cluster no MongoDB Atlas
