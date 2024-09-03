@@ -1,0 +1,2 @@
+web: deno run --allow-env --allow-net main.ts
+watcher: deno run --allow-env --allow-net watcher.ts
