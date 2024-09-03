@@ -3,13 +3,13 @@
     "builds": [
       {
         "src": "main.ts",
-        "use": "vercel-deno"
+        "use": "vercel-deno@0.9.0"  
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "/main.ts"
+        "dest": "/main.ts"  
       }
     ]
   }
