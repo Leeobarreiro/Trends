@@ -15,16 +15,8 @@ export default async function handler(req: Request) {
       collection: 'comments', // Nome da coleção com os dados relevantes
       pipeline: [
         {
-          $addFields: {
-            hashtags: { $regexFindAll: { input: "$text", regex: /#\w+/g } }
-          }
-        },
-        {
-          $unwind: "$hashtags"
-        },
-        {
           $group: {
-            _id: "$hashtags.match",
+            _id: "$hashtag",
             count: { $sum: 1 }
           }
         },
