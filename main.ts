@@ -1,11 +1,11 @@
-
 const MONGO_URI = 'mongodb+srv://Rivick:Xdplos2adr@cluster0.mongodb.net/sample_mflix?retryWrites=true&w=majority';
 const MONGO_DATA_API_URL = 'https://sa-east-1.aws.data.mongodb-api.com/app/data-jlaekkp/endpoint/data/v1';
 const MONGO_API_KEY = 'yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJs';
 
-// Conectar ao MongoDB e buscar dados
+// Função para conectar ao MongoDB e buscar dados
 export default async function handler(req: Request) {
   if (req.method === 'GET') {
+    // Definindo o corpo da requisição para a API do MongoDB
     const body = {
       dataSource: 'Cluster0',
       database: 'sample_mflix',
@@ -14,23 +14,23 @@ export default async function handler(req: Request) {
         {
           $group: {
             _id: "$hashtag",
-            count: { $sum: 1 }
-          }
+            count: { $sum: 1 },
+          },
         },
         {
           $project: {
             _id: 0,
             hashtag: "$_id",
-            count: 1
-          }
+            count: 1,
+          },
         },
         {
-          $sort: { count: -1 }
+          $sort: { count: -1 },
         },
         {
-          $limit: 10
-        }
-      ]
+          $limit: 10, // Você pode alterar conforme necessário
+        },
+      ],
     };
 
     try {
@@ -40,7 +40,7 @@ export default async function handler(req: Request) {
           'Content-Type': 'application/json',
           'api-key': MONGO_API_KEY,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
