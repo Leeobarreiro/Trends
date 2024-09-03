@@ -1,16 +1,20 @@
 export const config = {
-	runtime: 'edge', // Runtime para edge functions
+	runtime: 'edge', // Utilizando o runtime edge para serverless
   };
   
   export default async function handler(req: Request) {
 	if (req.method === 'GET') {
-	  const MONGO_DATA_API_URL = Deno.env.get("MONGO_DATA_API_URL") as string;
-	  const MONGO_API_KEY = Deno.env.get("MONGO_API_KEY") as string;
-	  
+	  const MONGO_DATA_API_URL = Deno.env.get('MONGO_DATA_API_URL');
+	  const MONGO_API_KEY = Deno.env.get('MONGO_API_KEY');
+  
+	  if (!MONGO_DATA_API_URL || !MONGO_API_KEY) {
+		return new Response('Configuração da API MongoDB faltando', { status: 500 });
+	  }
+  
 	  const body = {
 		dataSource: 'Cluster0', // Nome do cluster no MongoDB Atlas
 		database: 'sample_mflix', // Nome do banco de dados
-		collection: 'comments', // Nome da coleção com os dados relevantes
+		collection: 'comments', // Nome da coleção
 		pipeline: [
 		  {
 			$group: {
@@ -39,9 +43,9 @@ export const config = {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
-			'api-key': MONGO_API_KEY, // Use sua API Key
+			'api-key': MONGO_API_KEY,
 		  },
-		  body: JSON.stringify(body)
+		  body: JSON.stringify(body),
 		});
   
 		const data = await response.json();
