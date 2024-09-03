@@ -1,9 +1,10 @@
+// Importar a biblioteca do MongoDB
 import { MongoClient } from 'mongodb';
 
 // Configurar o URI de conexão do MongoDB
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
+const MONGO_URI = 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
 
-// Conectar ao MongoDB e buscar dados
+// Função handler para a API
 export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     // Conectar ao cliente MongoDB
@@ -48,13 +49,12 @@ export default async function handler(req: any, res: any) {
       
     } catch (error) {
       console.error('Erro ao conectar ao MongoDB ou buscar dados:', error);
-      res.status(500).json({ message: 'Erro interno do servidor' });
+      res.status(500).json({ error: 'Erro interno do servidor' });
     } finally {
       // Fechar a conexão com o cliente MongoDB
       await client.close();
     }
   } else {
-    res.setHeader('Allow', ['GET']);
-    res.status(405).end(`Método ${req.method} não permitido`);
+    res.status(405).json({ error: 'Método não permitido' });
   }
 }
