@@ -6,13 +6,12 @@ export const config = {
 
 export default async function handler(req: Request) {
   if (req.method === 'GET') {
-    const MONGO_DATA_API_URL = 'https://data.mongodb-api.com/app/yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJs/endpoint/data/v1/action/aggregate';
-    const MONGO_API_KEY = 'yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJs';
-    
+    const MONGO_DATA_API_URL = 'https://sa-east-1.aws.data.mongodb-api.com/app/data-jlaekkp/endpoint/data/v1/action/aggregate'; // URL correta para a ação de agregação
+    const MONGO_API_KEY = 'yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJ'; // Sua chave de API
+
     const body = {
-      dataSource: 'Cluster0', // Nome do cluster no MongoDB Atlas
-      database: 'mydatabase',
-      collection: 'hashtags',
+      dataSource: 'Cluster0', // Nome do cluster
+      database: 'Trending', // Nome do banco de dados
       pipeline: [
         {
           $group: {
@@ -41,7 +40,7 @@ export default async function handler(req: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'api-key': MONGO_API_KEY, // Use sua API Key
+          'api-key': MONGO_API_KEY, // Use sua API Key aqui
         },
         body: JSON.stringify(body)
       });
