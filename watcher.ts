@@ -86,4 +86,4 @@ const init = () => {
     ws.onopen = () => console.log('Connection opened')
 }
 
-init()
+init();
