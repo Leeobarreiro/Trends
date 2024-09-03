@@ -1,16 +1,10 @@
-// Importar a biblioteca do MongoDB
 import { MongoClient } from 'mongodb';
 
-// Definir a configuração da função
-export const config = {
-  runtime: 'edge',
-};
-
 // Configurar o URI de conexão do MongoDB
-const MONGO_URI = 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
 
 // Conectar ao MongoDB e buscar dados
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     // Conectar ao cliente MongoDB
     const client = new MongoClient(MONGO_URI);
@@ -50,18 +44,17 @@ export default async function handler(req: Request) {
       const trends = await collection.aggregate(pipeline).toArray();
 
       // Retornar os resultados como resposta JSON
-      return new Response(JSON.stringify(trends), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      res.status(200).json(trends);
       
     } catch (error) {
       console.error('Erro ao conectar ao MongoDB ou buscar dados:', error);
-      return new Response('Erro interno do servidor', { status: 500 });
+      res.status(500).json({ message: 'Erro interno do servidor' });
     } finally {
       // Fechar a conexão com o cliente MongoDB
       await client.close();
     }
   } else {
-    return new Response('Método não permitido', { status: 405 });
+    res.setHeader('Allow', ['GET']);
+    res.status(405).end(`Método ${req.method} não permitido`);
   }
 }
