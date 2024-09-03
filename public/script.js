@@ -1,11 +1,21 @@
 document.getElementById('fetchTrending').addEventListener('click', () => {
-    fetch('/api/trends') // Altere para o endpoint da função serverless
-        .then(response => response.json())
-        .then(data => displayTrendingTopics(data))
+    console.log('Botão "Atualizar Trending" clicado.'); // Log de depuração
+    fetch('/api/trends') // Endpoint da função serverless
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro na resposta: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Dados recebidos do servidor:', data); // Log de depuração
+            displayTrendingTopics(data);
+        })
         .catch(error => console.error('Erro ao buscar tendências:', error));
 });
 
 function displayTrendingTopics(data) {
+    console.log('Exibindo Trending Topics:', data); // Log de depuração
     const trendingDiv = document.getElementById("trending");
     trendingDiv.innerHTML = "<h2>Trending Hashtags</h2>";
 
