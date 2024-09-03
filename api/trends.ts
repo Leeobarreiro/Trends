@@ -1,56 +1,66 @@
-import { MongoClient } from 'mongodb';
+// api/trends.ts
 
-const MONGO_URI = 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
+export const config = {
+  runtime: 'edge', // Runtime para edge functions
+};
 
-export default async function handler(req: any, res: any) {
-  console.log('Request received:', req.method);
-
+export default async function handler(req: Request) {
   if (req.method === 'GET') {
-    const client = new MongoClient(MONGO_URI);
+    const MONGO_DATA_API_URL = 'https://data.mongodb-api.com/app/yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJs/endpoint/data/v1/action/aggregate';
+    const MONGO_API_KEY = 'yJjLHkVWTUCMMhyGj1tWVJJrrpCig1azv4lguI7SMwnmLIH3XJvvXibWxS6ivwJs';
     
-    try {
-      console.log('Connecting to MongoDB...');
-      await client.connect();
-      console.log('Connected to MongoDB');
-
-      const db = client.db('mydatabase');
-      const collection = db.collection('hashtags');
-
-      const pipeline = [
+    const body = {
+      dataSource: 'Cluster0', // Nome do cluster no MongoDB Atlas
+      database: 'mydatabase',
+      collection: 'hashtags',
+      pipeline: [
         {
           $group: {
             _id: "$hashtag",
-            count: { $sum: 1 },
-          },
+            count: { $sum: 1 }
+          }
         },
         {
           $project: {
             _id: 0,
             hashtag: "$_id",
-            count: 1,
-          },
+            count: 1
+          }
         },
         {
-          $sort: { count: -1 },
+          $sort: { count: -1 }
         },
         {
-          $limit: 10,
+          $limit: 10
+        }
+      ]
+    };
+
+    try {
+      const response = await fetch(MONGO_DATA_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': MONGO_API_KEY, // Use sua API Key
         },
-      ];
+        body: JSON.stringify(body)
+      });
 
-      console.log('Executing aggregation pipeline...');
-      const trends = await collection.aggregate(pipeline).toArray();
-      console.log('Aggregation result:', trends);
+      const data = await response.json();
 
-      res.status(200).json(trends);
+      if (response.ok) {
+        return new Response(JSON.stringify(data.documents), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        console.error('Erro na resposta da API MongoDB:', data);
+        return new Response('Erro ao buscar dados', { status: 500 });
+      }
     } catch (error) {
-      console.error('Error while connecting to MongoDB or fetching data:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    } finally {
-      console.log('Closing MongoDB connection');
-      await client.close();
+      console.error('Erro ao conectar à MongoDB Data API:', error);
+      return new Response('Erro interno do servidor', { status: 500 });
     }
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    return new Response('Método não permitido', { status: 405 });
   }
 }
