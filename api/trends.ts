@@ -1,24 +1,21 @@
-// Importar a biblioteca do MongoDB
 import { MongoClient } from 'mongodb';
 
-// Configurar o URI de conexão do MongoDB
 const MONGO_URI = 'mongodb+srv://Rivick:Xdplos2adr@cluster0.1gcqz.mongodb.net/mydatabase?retryWrites=true&w=majority';
 
-// Função handler para a API
 export default async function handler(req: any, res: any) {
+  console.log('Request received:', req.method);
+
   if (req.method === 'GET') {
-    // Conectar ao cliente MongoDB
     const client = new MongoClient(MONGO_URI);
     
     try {
-      // Conectar ao MongoDB
+      console.log('Connecting to MongoDB...');
       await client.connect();
+      console.log('Connected to MongoDB');
 
-      // Selecionar o banco de dados e a coleção
       const db = client.db('mydatabase');
       const collection = db.collection('hashtags');
 
-      // Realizar uma consulta agregada para obter as hashtags mais populares
       const pipeline = [
         {
           $group: {
@@ -37,24 +34,23 @@ export default async function handler(req: any, res: any) {
           $sort: { count: -1 },
         },
         {
-          $limit: 10, // Alterar conforme necessário
+          $limit: 10,
         },
       ];
 
-      // Executar a consulta
+      console.log('Executing aggregation pipeline...');
       const trends = await collection.aggregate(pipeline).toArray();
+      console.log('Aggregation result:', trends);
 
-      // Retornar os resultados como resposta JSON
       res.status(200).json(trends);
-      
     } catch (error) {
-      console.error('Erro ao conectar ao MongoDB ou buscar dados:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
+      console.error('Error while connecting to MongoDB or fetching data:', error);
+      res.status(500).json({ error: 'Internal server error' });
     } finally {
-      // Fechar a conexão com o cliente MongoDB
+      console.log('Closing MongoDB connection');
       await client.close();
     }
   } else {
-    res.status(405).json({ error: 'Método não permitido' });
+    res.status(405).json({ error: 'Method not allowed' });
   }
 }
